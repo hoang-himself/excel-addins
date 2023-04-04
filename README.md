@@ -1,11 +1,9 @@
 # Macro Excel
 
-Macro Excel viết bằng VBS đã unlock hoặc crack
+Open VBA Editor with <kbd>ALT</kbd> + <kbd>F11</kbd>
 
-Trong mỗi thư mục đều chứa 3 file add-in: file gốc, file đã bỏ mật khẩu VBAProject, và file đã crack
+## Installing add-ins
 
-## Cài đặt add-in
+Method 1: Via `Options`
 
-Cách 1: Cài bằng mục Options
-
-Cách 2: Di chuyển file đã crack vào `%APPDATA%\Roaming\Microsoft\Excel\XLSTART\`
+Method 2: Excel automatically load add-ins from `%APPDATA%\Roaming\Microsoft\Excel\XLSTART\`
