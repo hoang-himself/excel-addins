@@ -1,0 +1,4 @@
+{
+  "name": "Mono",
+  "image": "docker.io/library/mono:6"
+}
