@@ -1,7 +1,11 @@
-# Tiện ích Excel v3.0
+# Tiện ích Excel
 
-[Trang chủ](https://sites.google.com/site/hotroketoannhatruong/tien-ich-excel)
+[Homepage](https://sites.google.com/site/hotroketoannhatruong/ti%25E1%25BB%2587n-%25C3%25ADch-excel)
 
-## Note
+[Download](https://drive.google.com/drive/folders/1awyu9mXBWQMPn5yag9_hJl5exfRomf5P)
 
-File `C:\Excelh\diadanh.xls` bị truy xuất rất nhiều nên phải để lại
+[Mirror](https://padlet.com/nguyenthanhhaimylong/tienichexcel)
+
+## Takeaways
+
+- Database file is in `xls` format, at `C:\PgEx\TTHT.dat`
