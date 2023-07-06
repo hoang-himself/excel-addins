@@ -1,4 +1,8 @@
 {
   "name": "Mono",
-  "image": "docker.io/library/mono:6"
+  "image": "docker.io/library/mono:6",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  }
 }
