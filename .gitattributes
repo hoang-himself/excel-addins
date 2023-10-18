@@ -8,8 +8,12 @@
 #
 
 # Binaries
+*.dat       binary
 *.xlam      binary
 *.xlsm      binary
+
+# Archives
+*.zip binary
 
 # Text files where line endings should be preserved
 *.patch    -text
