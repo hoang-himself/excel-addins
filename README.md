@@ -6,7 +6,7 @@ Open VBA Editor with <kbd>ALT</kbd> + <kbd>F11</kbd>
 
 Method 1: Via `Options`
 
-Method 2: Excel automatically load add-ins from `%APPDATA%\Roaming\Microsoft\Excel\XLSTART\`
+Method 2: Excel automatically load add-ins from `%APPDATA%\Microsoft\Excel\XLSTART\`
 
 ## Bypass project properties
 
