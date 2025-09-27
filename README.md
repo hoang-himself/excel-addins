@@ -1,4 +1,4 @@
-# Macro Excel
+# Excel add-ins
 
 Open VBA Editor with <kbd>ALT</kbd> + <kbd>F11</kbd>
 
@@ -11,43 +11,45 @@ Method 2: Excel automatically load add-ins from `%APPDATA%\Microsoft\Excel\XLSTA
 ## Bypass project properties
 
 1. Open the file(s) containing locked VBA projects
-2. Create a new macro file (xlsm, xlam)
-3. Insert **Module1** with the following code
+1. Create a new file
+1. Insert **Module1** with the following code
+    <details>
+      <summary>VB</summary>
 
-    ```vb
-    Option Explicit
+      ```vb
+      Option Explicit
 
-    Private Const PAGE_EXECUTE_READWRITE = &H40
+      Private Const PAGE_EXECUTE_READWRITE = &H40
 
-    Private Declare PtrSafe Sub MoveMemory Lib "kernel32" Alias "RtlMoveMemory" _
-    (Destination As LongPtr, Source As LongPtr, ByVal Length As LongPtr)
+      Private Declare PtrSafe Sub MoveMemory Lib "kernel32" Alias "RtlMoveMemory" _
+        (Destination As LongPtr, Source As LongPtr, ByVal Length As LongPtr)
 
-    Private Declare PtrSafe Function VirtualProtect Lib "kernel32" (lpAddress As LongPtr, _
-    ByVal dwSize As LongPtr, ByVal flNewProtect As LongPtr, lpflOldProtect As LongPtr) As LongPtr
+      Private Declare PtrSafe Function VirtualProtect Lib "kernel32" (lpAddress As LongPtr, _
+        ByVal dwSize As LongPtr, ByVal flNewProtect As LongPtr, lpflOldProtect As LongPtr) As LongPtr
 
-    Private Declare PtrSafe Function GetModuleHandleA Lib "kernel32" (ByVal lpModuleName As String) As LongPtr
+      Private Declare PtrSafe Function GetModuleHandleA Lib "kernel32" (ByVal lpModuleName As String) As LongPtr
 
-    Private Declare PtrSafe Function GetProcAddress Lib "kernel32" (ByVal hModule As LongPtr, _
-    ByVal lpProcName As String) As LongPtr
+      Private Declare PtrSafe Function GetProcAddress Lib "kernel32" (ByVal hModule As LongPtr, _
+        ByVal lpProcName As String) As LongPtr
 
-    Private Declare PtrSafe Function DialogBoxParam Lib "user32" Alias "DialogBoxParamA" (ByVal hInstance As LongPtr, _
-    ByVal pTemplateName As LongPtr, ByVal hWndParent As LongPtr, _
-    ByVal lpDialogFunc As LongPtr, ByVal dwInitParam As LongPtr) As Integer
+      Private Declare PtrSafe Function DialogBoxParam Lib "user32" Alias "DialogBoxParamA" (ByVal hInstance As LongPtr, _
+        ByVal pTemplateName As LongPtr, ByVal hWndParent As LongPtr, _
+        ByVal lpDialogFunc As LongPtr, ByVal dwInitParam As LongPtr) As Integer
 
-    Dim HookBytes(0 To 11) As Byte
-    Dim OriginBytes(0 To 11) As Byte
-    Dim pFunc As LongPtr
-    Dim Flag As Boolean
+      Dim HookBytes(0 To 11) As Byte
+      Dim OriginBytes(0 To 11) As Byte
+      Dim pFunc As LongPtr
+      Dim Flag As Boolean
 
-    Private Function GetPtr(ByVal Value As LongPtr) As LongPtr
+      Private Function GetPtr(ByVal Value As LongPtr) As LongPtr
         GetPtr = Value
-    End Function
+      End Function
 
-    Public Sub RecoverBytes()
+      Public Sub RecoverBytes()
         If Flag Then MoveMemory ByVal pFunc, ByVal VarPtr(OriginBytes(0)), 12
-    End Sub
+      End Sub
 
-    Public Function Hook() As Boolean
+      Public Function Hook() As Boolean
         Dim TmpBytes(0 To 11) As Byte
         Dim p As LongPtr, osi As Byte
         Dim OriginProtect As LongPtr
@@ -55,57 +57,62 @@ Method 2: Excel automatically load add-ins from `%APPDATA%\Microsoft\Excel\XLSTA
         Hook = False
 
         #If Win64 Then
-            osi = 1
+          osi = 1
         #Else
-            osi = 0
+          osi = 0
         #End If
 
         pFunc = GetProcAddress(GetModuleHandleA("user32.dll"), "DialogBoxParamA")
 
         If VirtualProtect(ByVal pFunc, 12, PAGE_EXECUTE_READWRITE, OriginProtect) <> 0 Then
+          MoveMemory ByVal VarPtr(TmpBytes(0)), ByVal pFunc, osi+1
+          If TmpBytes(osi) <> &HB8 Then
 
-            MoveMemory ByVal VarPtr(TmpBytes(0)), ByVal pFunc, osi+1
-            If TmpBytes(osi) <> &HB8 Then
+            MoveMemory ByVal VarPtr(OriginBytes(0)), ByVal pFunc, 12
 
-                MoveMemory ByVal VarPtr(OriginBytes(0)), ByVal pFunc, 12
+            p = GetPtr(AddressOf MyDialogBoxParam)
 
-                p = GetPtr(AddressOf MyDialogBoxParam)
+            If osi Then HookBytes(0) = &H48
+            HookBytes(osi) = &HB8
+            osi = osi + 1
+            MoveMemory ByVal VarPtr(HookBytes(osi)), ByVal VarPtr(p), 4 * osi
+            HookBytes(osi + 4 * osi) = &HFF
+            HookBytes(osi + 4 * osi + 1) = &HE0
 
-                If osi Then HookBytes(0) = &H48
-                HookBytes(osi) = &HB8
-                osi = osi + 1
-                MoveMemory ByVal VarPtr(HookBytes(osi)), ByVal VarPtr(p), 4 * osi
-                HookBytes(osi + 4 * osi) = &HFF
-                HookBytes(osi + 4 * osi + 1) = &HE0
-
-                MoveMemory ByVal pFunc, ByVal VarPtr(HookBytes(0)), 12
-                Flag = True
-                Hook = True
-            End If
+            MoveMemory ByVal pFunc, ByVal VarPtr(HookBytes(0)), 12
+            Flag = True
+            Hook = True
+          End If
         End If
-    End Function
+      End Function
 
-    Private Function MyDialogBoxParam(ByVal hInstance As LongPtr, _
-    ByVal pTemplateName As LongPtr, ByVal hWndParent As LongPtr, _
-    ByVal lpDialogFunc As LongPtr, ByVal dwInitParam As LongPtr) As Integer
+      Private Function MyDialogBoxParam(ByVal hInstance As LongPtr, _
+        ByVal pTemplateName As LongPtr, ByVal hWndParent As LongPtr, _
+        ByVal lpDialogFunc As LongPtr, ByVal dwInitParam As LongPtr) As Integer
 
         If pTemplateName = 4070 Then
-            MyDialogBoxParam = 1
+          MyDialogBoxParam = 1
         Else
-            RecoverBytes
-            MyDialogBoxParam = DialogBoxParam(hInstance, pTemplateName, _
-                       hWndParent, lpDialogFunc, dwInitParam)
-            Hook
+          RecoverBytes
+          MyDialogBoxParam = DialogBoxParam( _
+            hInstance, pTemplateName, hWndParent, lpDialogFunc, dwInitParam)
+          Hook
         End If
-    End Function
-    ```
+      End Function
+      ```
 
-4. Insert **Module2** with the following code and run it
+    </details>
 
-    ```vb
-    Sub unprotected()
+1. Insert **Module2** with the following code and run it
+    <details>
+      <summary>VB</summary>
+
+      ```vb
+      Sub unprotected()
         If Hook Then
-            MsgBox "VBA Project is unprotected!", vbInformation, "*****"
+          MsgBox "VBA Project is unprotected!", vbInformation, "*****"
         End If
-    End Sub
-    ```
+      End Sub
+      ```
+
+    </details>
