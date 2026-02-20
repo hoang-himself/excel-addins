@@ -1,4 +1,6 @@
-# Common settings that generally should always be used with your language specific settings
+# Exclude files from exporting
+.git* export-ignore
+utils/ export-ignore
 
 # Auto detect text files and perform LF normalization
 * text=auto
@@ -8,19 +10,8 @@
 #
 
 # Binaries
-*.dat binary
 *.xlam binary
 *.xlsm binary
 
 # Archives
 *.zip binary
-
-# Text files where line endings should be preserved
-*.patch -text
-
-#
-# Exclude files from exporting
-#
-
-.git* export-ignore
-utils/ export-ignore
